@@ -930,7 +930,7 @@
         select.appendChild(option);
       });
 
-      const preferred = state.teams.find(t => t.teamNo === "MTWDC W6") || state.teams[0];
+      const preferred = state.teams[0];
       state.selectedKey = preferred?.key || "";
       select.value = state.selectedKey;
 
