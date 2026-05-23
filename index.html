@@ -935,7 +935,7 @@
       document.getElementById("teamAgainst").textContent = record.against;
       document.getElementById("roundsPlayed").textContent = `${data.roundsPlayed} rounds played, excluding byes`;
 
-      document.getElementById("bestWinPct").textContent = listNames(stats.filter(s => s.winPct !== null), "winPct", v => `${v}%`);
+      document.getElementById("bestWinPct").textContent = listNames(stats.filter(s => s.winPct !== null && s.appearances >= 3), "winPct", v => `${v}%`);
       document.getElementById("mostWins").textContent = listNames(stats, "wins", v => v);
       document.getElementById("mostAppearances").textContent = listNames(stats, "appearances", v => v);
 
