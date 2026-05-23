@@ -364,6 +364,49 @@
       line-height:1.45;
     }
 
+    .potd-list{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .potd-row{
+      display:grid;
+      grid-template-columns:54px 1fr auto;
+      gap:10px;
+      align-items:center;
+      padding:12px;
+      border-radius:14px;
+      background:rgba(255,255,255,.045);
+      border:1px solid rgba(255,255,255,.075);
+    }
+    .potd-round{
+      color:#111;
+      background:var(--orange);
+      border-radius:999px;
+      font-weight:950;
+      width:34px;
+      height:34px;
+      display:grid;
+      place-items:center;
+    }
+    .potd-names{
+      font-weight:850;
+      font-size:.96rem;
+      line-height:1.25;
+    }
+    .potd-meta{
+      color:var(--muted);
+      font-size:.78rem;
+      margin-top:3px;
+    }
+    .potd-wins{
+      color:var(--orange);
+      font-size:1.2rem;
+      line-height:1;
+      font-weight:950;
+      white-space:nowrap;
+    }
+
     .results{display:flex; flex-direction:column; gap:8px}
     .result-row{
       display:grid;
@@ -543,6 +586,16 @@
       </div>
       <div class="card">
         <div class="results" id="roundResults"></div>
+      </div>
+    </section>
+
+    <section id="playersOfDay" hidden>
+      <div class="section-title">
+        <h2>Player/s of the Day</h2>
+        <span>Top singles wins</span>
+      </div>
+      <div class="card">
+        <div class="potd-list" id="playerOfDayList"></div>
       </div>
     </section>
 
@@ -797,9 +850,34 @@
         };
       });
 
+      const playersOfDay = completedRounds.map(roundResult => {
+        const roundColumn = rounds.find(col => col.round === roundResult.round);
+        if(!roundColumn) return null;
+
+        const scoredPlayers = team.players.map(player => ({
+          name: player.name,
+          wins: numberOrNull(getCell(player.values, roundColumn.index))
+        })).filter(player => player.wins !== null);
+
+        if(!scoredPlayers.length) return null;
+
+        const bestWins = Math.max(...scoredPlayers.map(player => player.wins));
+        const winners = scoredPlayers
+          .filter(player => player.wins === bestWins)
+          .map(player => player.name);
+
+        return {
+          round: roundResult.round,
+          opponent: roundResult.opponent,
+          wins: bestWins,
+          players: winners
+        };
+      }).filter(Boolean);
+
       return {
         record,
         completedRounds,
+        playersOfDay,
         playerStats,
         roundsPlayed: completedRounds.length
       };
@@ -849,6 +927,7 @@
       document.getElementById("win").hidden = false;
       document.getElementById("appearances").hidden = false;
       document.getElementById("results").hidden = false;
+      document.getElementById("playersOfDay").hidden = false;
 
       document.getElementById("subtitle").textContent = formatTeamLabel(team);
       document.getElementById("teamRecord").textContent = `${record.W} - ${record.D} - ${record.L}`;
@@ -920,6 +999,19 @@
           `).join("")}
         `
         : `<div class="empty">No round results have been entered for this team yet.</div>`;
+
+      document.getElementById("playerOfDayList").innerHTML = data.playersOfDay.length
+        ? data.playersOfDay.map(item => `
+            <article class="potd-row">
+              <div class="potd-round">${item.round}</div>
+              <div>
+                <div class="potd-names">${item.players.join(", ")}</div>
+                <div class="potd-meta">${item.opponent || "Opponent TBC"}</div>
+              </div>
+              <div class="potd-wins">${item.wins}/4</div>
+            </article>
+          `).join("")
+        : `<div class="empty">No completed rounds with player scores yet.</div>`;
     }
 
     function populateTeamSelect(){
