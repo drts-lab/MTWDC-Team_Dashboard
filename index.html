@@ -1001,7 +1001,9 @@
         : `<div class="empty">No round results have been entered for this team yet.</div>`;
 
       document.getElementById("playerOfDayList").innerHTML = data.playersOfDay.length
-        ? data.playersOfDay.map(item => `
+        ? `
+          <div class="result-row header"><div>Round</div><div>Player/s</div><div>Wins</div></div>
+          ${data.playersOfDay.map(item => `
             <article class="potd-row">
               <div class="potd-round">${item.round}</div>
               <div>
@@ -1010,7 +1012,8 @@
               </div>
               <div class="potd-wins">${item.wins}/4</div>
             </article>
-          `).join("")
+          `).join("")}
+        `
         : `<div class="empty">No completed rounds with player scores yet.</div>`;
     }
 
