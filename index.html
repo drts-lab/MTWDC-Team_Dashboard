@@ -41,10 +41,10 @@
       padding:max(18px, env(safe-area-inset-top)) 14px max(24px, env(safe-area-inset-bottom));
     }
 
-    .hero{padding:18px 4px 10px; text-align:center}
+    .hero{padding:12px 4px 8px; text-align:center}
     .club-logo{
-      width:140px;
-      height:140px;
+      width:118px;
+      height:118px;
       object-fit:contain;
       display:block;
       margin:0 auto 16px;
@@ -60,15 +60,25 @@
     }
     h1{
       margin:0;
-      font-size:clamp(2rem, 8vw, 3rem);
+      font-size:clamp(1.85rem, 7vw, 2.65rem);
       line-height:.92;
       letter-spacing:-.05em;
       font-weight:950;
       text-transform:uppercase;
     }
     .subtitle{color:var(--muted); margin-top:10px; font-size:1rem}
+    .select-heading{
+      margin-top:18px;
+      margin-bottom:8px;
+      color:var(--orange);
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      font-size:.72rem;
+      font-weight:950;
+    }
+
     .team-switcher{
-      margin-top:16px;
+      margin-top:0;
       display:flex;
       gap:10px;
       align-items:center;
@@ -193,6 +203,31 @@
       font-weight:950;
       letter-spacing:-.03em;
       color:var(--text);
+    }
+
+    .form-strip{
+      display:flex;
+      gap:7px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .form-pill{
+      width:34px;
+      height:34px;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      font-weight:950;
+      font-size:.92rem;
+      color:#111;
+      background:rgba(255,255,255,.18);
+    }
+    .form-pill.win{background:var(--green)}
+    .form-pill.draw{background:var(--yellow)}
+    .form-pill.loss{background:rgba(255,107,107,.86);color:#fff}
+
+    .highlights-card{
+      margin-top:14px;
     }
 
     .mini-grid{
@@ -517,6 +552,7 @@
       <div class="eyebrow">Mt Wellington Darts Club</div>
       <h1>Team Dashboard</h1>
       <div class="subtitle" id="subtitle">Loading live sheet data...</div>
+      <div class="select-heading">Select Team</div>
       <div class="team-switcher">
         <span>Team</span>
         <select id="teamSelect" aria-label="Select team">
@@ -534,6 +570,8 @@
           <div class="record-label">W - D - L</div>
           <div class="record" id="teamRecord">0 - 0 - 0</div>
           <div class="record-sub" id="roundsPlayed">0 rounds played, excluding byes</div>
+          <div class="record-sub" style="margin-top:12px;">Recent form</div>
+          <div class="form-strip" id="recentForm" aria-label="Recent form"></div>
         </div>
         <div class="for-against-row">
           <div class="score-card">
@@ -546,7 +584,10 @@
           </div>
         </div>
       </div>
+    </section>
 
+    <section id="playerHighlights" class="card highlights-card" hidden>
+      <div class="label">Player highlights</div>
       <div class="mini-grid">
         <div class="mini-stat">
           <div class="title">Best Win %</div>
@@ -924,6 +965,7 @@
       const stats = data.playerStats;
 
       document.getElementById("summary").hidden = false;
+      document.getElementById("playerHighlights").hidden = false;
       document.getElementById("win").hidden = false;
       document.getElementById("appearances").hidden = false;
       document.getElementById("results").hidden = false;
@@ -934,6 +976,11 @@
       document.getElementById("teamFor").textContent = record.for;
       document.getElementById("teamAgainst").textContent = record.against;
       document.getElementById("roundsPlayed").textContent = `${data.roundsPlayed} rounds played, excluding byes`;
+
+      const recent = data.completedRounds.slice(-5);
+      document.getElementById("recentForm").innerHTML = recent.length
+        ? recent.map(r => `<div class="form-pill ${r.type === "W" ? "win" : r.type === "D" ? "draw" : "loss"}">${r.type}</div>`).join("")
+        : `<span class="record-sub" style="margin-top:0;">No form yet</span>`;
 
       document.getElementById("bestWinPct").textContent = listNames(stats.filter(s => s.winPct !== null && s.appearances >= 3), "winPct", v => `${v}%`);
       document.getElementById("mostWins").textContent = listNames(stats, "wins", v => v);
