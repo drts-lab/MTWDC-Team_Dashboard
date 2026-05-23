@@ -861,7 +861,7 @@
       document.getElementById("mostAppearances").textContent = listNames(stats, "appearances", v => v);
 
       const winStats = ordinalRanks(
-        stats.filter(s => s.gamesPlayed > 0).sort((a,b) => b.winPct - a.winPct || b.wins - a.wins || a.name.localeCompare(b.name)),
+        stats.filter(s => s.appearances >= 3).sort((a,b) => b.winPct - a.winPct || b.wins - a.wins || a.name.localeCompare(b.name)),
         s => s.winPct
       );
 
@@ -873,9 +873,12 @@
             big: `${s.winPct}%`,
             pct: s.winPct
           })).join("")
-        : `<div class="empty">No individual results have been entered for this team yet.</div>`;
+        : `<div class="empty">No players have reached 3 nights yet.</div>`;
 
-      document.getElementById("winLeaderboard").innerHTML = winHtml;
+      document.getElementById("winLeaderboard").innerHTML = `
+        ${winHtml}
+        <p class="note" style="padding:8px 4px 0;margin:0;">Win % leaderboard only includes players who have played 3 or more nights.</p>
+      `;
 
       const groupedAppearances = new Map();
       [...stats]
